@@ -10,9 +10,11 @@ Stop logging of need not messages to log with an INFO level in production and st
 ## Usage
 Add to config/initializers/quiet_rails_logger.rb:
 
+```ruby
 QuietRailsLogger.configure do |config|
   config.environments = %w[production staging]
 end
+```
 
 ## Installation
 Add this line to your application's Gemfile:
