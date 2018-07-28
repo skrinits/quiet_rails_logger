@@ -1,7 +1,11 @@
 require 'test_helper'
 
 class QuietRailsLogger::Test < ActiveSupport::TestCase
-  test "truth" do
-    assert_kind_of Module, QuietRailsLogger
+  test 'unsubscribe' do
+    ActiveSupport::Subscriber.subscribers.each do |subscriber|
+      subscriber.patterns.each do |pattern|
+        assert_not(ActiveSupport::Notifications.notifier.listening?(pattern))
+      end
+    end
   end
 end

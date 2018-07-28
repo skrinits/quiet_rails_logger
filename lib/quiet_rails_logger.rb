@@ -13,14 +13,18 @@ module QuietRailsLogger
 
   class Engine < ::Rails::Engine
     initializer 'quiet_rails_logger.skip_info_messages' do |app|
-      if Rails.env.in?(QuietRailsLogger.configuration.environments)
-        ActiveSupport.on_load(:after_initialize) do
-          ActiveSupport::Subscriber.subscribers.each do |subscriber|
-            subscriber.patterns.each do |pattern|
-              ActiveSupport::Notifications.unsubscribe(pattern)
-            end
+      unsubscribe = lambda do
+        ActiveSupport::Subscriber.subscribers.each do |subscriber|
+          subscriber.patterns.each do |pattern|
+            ActiveSupport::Notifications.unsubscribe(pattern)
           end
         end
+      end
+
+      if Rails.env.in?(QuietRailsLogger.configuration.environments) || ENV['GEM'] == 'true'
+        ActiveSupport.on_load(:after_initialize) { unsubscribe.call }
+        ActiveSupport.on_load(:active_job) { unsubscribe.call }
+        ActiveSupport.on_load(:active_record) { unsubscribe.call }
 
         app.middleware.delete Rails::Rack::Logger
       end
