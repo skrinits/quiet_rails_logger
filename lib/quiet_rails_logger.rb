@@ -15,6 +15,8 @@ module QuietRailsLogger
     initializer 'quiet_rails_logger.skip_info_messages' do |app|
       unsubscribe = lambda do
         ActiveSupport::Subscriber.subscribers.each do |subscriber|
+          next unless subscriber.class.name =~ /LogSubscriber/
+
           subscriber.patterns.each do |pattern|
             ActiveSupport::Notifications.unsubscribe(pattern)
           end
